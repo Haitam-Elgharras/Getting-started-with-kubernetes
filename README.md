@@ -75,24 +75,23 @@ You can reuse these images instead of creating and pushing new container images
 
 
 ## Useful Commands summary
-1. ** Create the docker image for your application (eg: spring boot)**
-    - `mvn spring-boot:build-image`
+1. **Create the docker image for your application (eg: spring boot)**
+- `mvn spring-boot:build-image`
+2. **Push the docker image to docker hub**
+- `docker login`
+- `docker push username/image-name:tag`
 
-2. ** Push the docker image to docker hub**
-    - `docker login`
-    - `docker push username/image-name:tag`
+3. **Create a deployment in kubernetes**
+- `kubectl create deployment deployment-name --image=username/image-name:tag`
+- eg: `kubectl create deployment currency-exchange --image=haitamelgharras/mmv3-currency-exchange-service:0.0.11-SNAPSHOT`
 
-3. ** Create a deployment in kubernetes**
-    - `kubectl create deployment deployment-name --image=username/image-name:tag`
-    - eg: `kubectl create deployment currency-exchange --image=haitamelgharras/mmv3-currency-exchange-service:0.0.11-SNAPSHOT`
+4. **Expose the deployment as a service**
+- `kubectl expose deployment deployment-name --type=LoadBalancer --port=port`
+- eg: `kubectl expose deployment currency-exchange --type=LoadBalancer --port=8000`
 
-4. ** Expose the deployment as a service**
-    - `kubectl expose deployment deployment-name --type=LoadBalancer --port=port`
-    - eg: `kubectl expose deployment currency-exchange --type=LoadBalancer --port=8000`
-
-5. ** Test it using curl**
-    - `curl http://EXTERNAL-IP:PORT/endpoint`
-    - eg: `curl http://34.45.103.67:8000/currency-exchange/from/USD/to/INR`
+5. **Test it using curl**
+- `curl http://EXTERNAL-IP:PORT/endpoint`
+- eg: `curl http://34.45.103.67:8000/currency-exchange/from/USD/to/INR`
 
 
 ## Service Discovery in Kubernetes
