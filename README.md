@@ -72,3 +72,32 @@ You can reuse these images instead of creating and pushing new container images
 8. **Docker Push Commands:**
     - `docker push in28min/mmv3-currency-exchange-service:0.0.11-SNAPSHOT`: Push the currency exchange Docker image to the registry.
     - `docker push in28min/mmv3-currency-conversion-service:0.0.11-SNAPSHOT`: Push the currency conversion Docker image to the registry.
+
+
+## Useful Commands summary
+1. ** Create the docker image for your application (eg: spring boot)**
+    - `mvn spring-boot:build-image`
+
+2. ** Push the docker image to docker hub**
+    - `docker login`
+    - `docker push username/image-name:tag`
+
+3. ** Create a deployment in kubernetes**
+    - `kubectl create deployment deployment-name --image=username/image-name:tag`
+    - eg: `kubectl create deployment currency-exchange --image=haitamelgharras/mmv3-currency-exchange-service:0.0.11-SNAPSHOT`
+
+4. ** Expose the deployment as a service**
+    - `kubectl expose deployment deployment-name --type=LoadBalancer --port=port`
+    - eg: `kubectl expose deployment currency-exchange --type=LoadBalancer --port=8000`
+
+5. ** Test it using curl**
+    - `curl http://EXTERNAL-IP:PORT/endpoint`
+    - eg: `curl http://34.45.103.67:8000/currency-exchange/from/USD/to/INR`
+
+
+## Service Discovery in Kubernetes
+- Kubernetes auto-generates service environment variables when we create a service.
+- `Automatic Service Discovery`: Service Environment Variables: Kubernetes injects environment variables into each Pod based on the Services available at the time the Pod is created. This allows Pods to easily discover and connect to Services.
+- Pod name available via HOSTNAME variable.
+- Service name available via SERVICE_NAME variable.
+- We can call another service using ``SERVICE_NAME_SERVICE_HOST:PORT`` eg: ``CURRNECY_EXCHANGE_SERVICE_HOST:8000``
