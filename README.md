@@ -135,3 +135,40 @@ You can reuse these images instead of creating and pushing new container images
 - Service Specs:
   - Type: Set to LoadBalancer to expose the service externally.
   - Session Affinity: Set to None for REST APIs; session affinity is used for applications requiring all requests to go to the same instance.
+
+# Service Discovery Issue: Missing K8S Environment Variables When Services Start in Incorrect Order
+
+### Issue Explanation:
+
+1. **Service Discovery with Kubernetes:**
+    - Kubernetes provides a way for services to discover each other using DNS and environment variables. When a pod starts, Kubernetes sets up environment variables for each service that is currently available.
+    - For example, if we have a service called `currency-exchange`, Kubernetes might set an environment variable like `CURRENCY_EXCHANGE_SERVICE_HOST` with the hostname or IP of the `currency-exchange` service.
+
+2. **Problem Scenario:**
+    - Suppose we have two services: `currency-conversion` and `currency-exchange`.
+    - **If** the `currency-conversion` service pod starts **before** the `currency-exchange` service pod is up, the `currency-conversion` pod will not receive the environment variable `CURRENCY_EXCHANGE_SERVICE_HOST` because the `currency-exchange` service does not yet exist or is not yet available.
+    - In this case, the `currency-conversion` pod will fail to discover the `currency-exchange` service because it doesn’t have the necessary environment variable set.
+
+3. **Service Availability and Environment Variables:**
+    - Once the `currency-exchange` service is up, Kubernetes will create environment variables for it. However, this happens after the initial creation of the pod. If the `currency-conversion` pod was started before `currency-exchange` was available, it won’t receive the updated environment variables dynamically.
+    - Kubernetes doesn’t update environment variables of existing pods if a service becomes available later. Environment variables are set only once when the pod starts.
+
+### Solution Explanation:
+
+To avoid this problem, we can use a **custom environment variable** approach:
+
+1. **Custom Environment Variable:**
+    - Instead of relying on Kubernetes to automatically set environment variables for your services, explicitly define a custom environment variable in the pod’s deployment configuration.
+    - For example, in the `currency-conversion` service's deployment configuration, we would set an environment variable named `CURRENCY_EXCHANGE_URI` with a value like `http://currency-exchange`.
+
+2. **Advantages:**
+    - By explicitly defining the custom environment variable, we ensure that your `currency-conversion` service has a consistent way to find the `currency-exchange` service, even if the `currency-exchange` service starts after the `currency-conversion` service pod.
+
+3. **Implementation Steps:**
+    - Modify the `deployment.yaml` for the `currency-conversion` service to include the custom environment variable.
+    - Deploy the updated configuration, ensuring that the environment variable is available from the start.
+
+### Summary:
+
+- **Issue:** If `currency-conversion` starts before `currency-exchange`, it won’t get the `currency-exchange` environment variable and might fail.
+- **Solution:** Define a custom environment variable in the deployment configuration to ensure consistent service discovery and avoid relying on dynamically-set environment variables that might not be available at startup.
