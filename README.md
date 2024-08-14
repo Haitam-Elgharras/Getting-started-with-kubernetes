@@ -75,8 +75,10 @@ You can reuse these images instead of creating and pushing new container images
 
 
 ## Useful Commands summary
+
 1. **Create the docker image for your application (eg: spring boot)**
 - `mvn spring-boot:build-image`
+
 2. **Push the docker image to docker hub**
 - `docker login`
 - `docker push username/image-name:tag`
@@ -94,9 +96,41 @@ You can reuse these images instead of creating and pushing new container images
 - eg: `curl http://34.45.103.67:8000/currency-exchange/from/USD/to/INR`
 
 
-## Service Discovery in Kubernetes
+### Service Discovery in Kubernetes
 - Kubernetes auto-generates service environment variables when we create a service.
 - `Automatic Service Discovery`: Service Environment Variables: Kubernetes injects environment variables into each Pod based on the Services available at the time the Pod is created. This allows Pods to easily discover and connect to Services.
 - Pod name available via HOSTNAME variable.
 - Service name available via SERVICE_NAME variable.
 - We can call another service using ``SERVICE_NAME_SERVICE_HOST:PORT`` eg: ``CURRNECY_EXCHANGE_SERVICE_HOST:8000``
+
+
+### Kubernetes Service and Deployment Management with yaml
+1. **Notes**
+- To get the yaml of a deployment or service and save it to a file
+  - `kubectl get deployment currency-exchange -o yaml >> deployment.yaml`
+  - `kubectl get svc currency-exchange -o yaml >> service.yaml`
+- We can combine the deployment and service yaml into a single file by adding ``---`` between them
+- If we make changes to the yaml file, we can apply the changes using `kubectl apply -f deployment.yaml`
+- To see the diff of the changes that will be applied, we can use `kubectl diff -f deployment.yaml`
+
+2. **Simplifying yaml**
+- Simplify the deployment.yaml file by removing unnecessary fields:
+  - Remove: Creation timestamp, generation, resource version, self link, UID, progress deadline, revision history limit, termination message path, termination message policy, DNS policy, schedule name, security context, termination grace period in seconds, and status.
+  - Keep: Labels, name, namespace, replicas, selectors, strategy, and template.
+
+3. **Deployment Configuration**
+
+- Pod Template: Contains container specs such as image, image pull policy, and container name. Multiple containers can be specified within a pod.
+- Restart Policy: Set to Always to ensure containers are restarted if they fail.
+- Labels: Apply to both the pod and the deployment for identification. 
+- Deployment Specs:
+  - Replicas: Define the number of pod replicas.
+  - Strategy: Use RollingUpdate to update pods incrementally.
+  - Match Labels: Ensure deployment targets the correct pods.
+
+4. **Service Configuration**
+- Port: Define the port on which the service listens.
+- Target Port: Define the port on which the service forwards requests to the pod.
+- Service Specs:
+  - Type: Set to LoadBalancer to expose the service externally.
+  - Session Affinity: Set to None for REST APIs; session affinity is used for applications requiring all requests to go to the same instance.
