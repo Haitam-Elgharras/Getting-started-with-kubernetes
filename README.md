@@ -172,3 +172,28 @@ To avoid this problem, we can use a **custom environment variable** approach:
 
 - **Issue:** If `currency-conversion` starts before `currency-exchange`, it won’t get the `currency-exchange` environment variable and might fail.
 - **Solution:** Define a custom environment variable in the deployment configuration to ensure consistent service discovery and avoid relying on dynamically-set environment variables that might not be available at startup.
+
+
+# Centralized Configuration Management with Kubernetes ConfigMaps
+
+In Kubernetes, to avoid hardcoding configuration values, you can use `ConfigMaps` for centralized configuration management.
+
+1. **Create a ConfigMap**:
+    - Use the command `kubectl create configmap confmap_name --from-literal=env_name=env_value` to create a ConfigMap with the key-value pair.
+    - For example, `kubectl create configmap currency-conversion --from-literal=CURRENCY_EXCHANGE_URI=http://currency-exchange` creates a ConfigMap named `currency-conversion` with the key `CURRENCY_EXCHANGE_URI` and value `http://currency-exchange`.
+    - As best practice, redirect the ConfigMap to a YAML file using `kubectl get configmap confmap_name -o yaml >> configmap.yaml` then move the ConfigMap to deployment configuration.    
+
+2. **Verify ConfigMap**:
+    - Check the ConfigMap using `kubectl get configmap` and `kubectl get configmap currency-conversion-service -o yaml` to view its YAML configuration.
+
+3. **Update Deployment YAML**:
+    - Add the ConfigMap configuration to your `deployment.yaml` file.
+    - Comment out any hardcoded environment variables.
+    - Reference the ConfigMap for environment variables in the deployment configuration.
+
+4. **Apply Changes**:
+    - Apply the updated `deployment.yaml` with `kubectl apply -f deployment.yaml`.
+    - Ensure the new pod is launched and the service is operational.
+
+5. **Benefits**:
+    - ConfigMaps allow for centralized management of configuration data for microservices and different environments.
