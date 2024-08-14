@@ -26,6 +26,14 @@ spec:
         - image: haitamelgharras/mmv3-currency-exchange-service:0.0.12-SNAPSHOT
           imagePullPolicy: IfNotPresent
           name: mmv2-currency-exchange-service
+          readinessProbe:
+            httpGet:
+              port: 8000
+              path: /actuator/health/readiness
+          livenessProbe:
+            httpGet:
+              port: 8000
+              path: /actuator/health/liveness
           resources:
             limits:
               cpu: 500m

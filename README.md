@@ -197,3 +197,13 @@ In Kubernetes, to avoid hardcoding configuration values, you can use `ConfigMaps
 
 5. **Benefits**:
     - ConfigMaps allow for centralized management of configuration data for microservices and different environments.
+
+# Kubernetes Downtime and Zero Downtime Deployments
+### Introduction to Kubernetes Downtime and Zero Downtime Deployments
+- When deploying a new version of a service, mistakes such as incorrect image names can lead to failed deployments. Kubernetes, however, intelligently maintains the old version of the service to ensure continued operation. The challenge arises during the transition between service versions, where brief periods of downtime may occur if the new version takes time to start up while the old one is being shut down. This downtime is undesirable, and the issue is how to avoid it while ensuring smooth and reliable deployments.
+`{"timestamp":"2024-08-14T16:03:43.772+00:00","status":500,"error":"Internal Server Error","path":"/currency-conversion-feign/from/USD/to/IN
+  R/quantity/10"}`.
+### Brief solution to downtime
+
+The solution to avoid downtime during deployments in Kubernetes involves using ``Liveness`` and Readiness ``Probes``. These probes check the health and readiness of a microservice. The Readiness Probe ensures that traffic is only directed to a service when it's ready, preventing downtime during startup. The Liveness Probe monitors the ongoing health of the service and restarts it if necessary. By configuring these probes, Kubernetes can ensure smooth transitions between service versions, avoiding downtime by only terminating old versions once the new ones are fully operational.
+spring actuator provides a health endpoint that can be used for readiness and liveness probes by just adding some properties in the application.properties file.
