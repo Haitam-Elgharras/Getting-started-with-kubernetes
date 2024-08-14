@@ -56,6 +56,7 @@ You can reuse these images instead of creating and pushing new container images
     - `kubectl get svc --watch`: Watch the status of services in real time.
     - `kubectl get deployments`: List all deployments.
     - `kubectl get deployment currency-exchange -o yaml >> deployment.yaml`: Export the deployment configuration to a YAML file.
+    - `kubectl delete all -l app=name_of_app`: Delete all resources with a specific label.
 
 6. **Kubernetes Rollout and Logs:**
     - `kubectl rollout history deployment currency-conversion`: View the rollout history of the currency conversion deployment.

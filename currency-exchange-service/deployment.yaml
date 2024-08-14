@@ -26,6 +26,15 @@ spec:
         - image: haitamelgharras/mmv3-currency-exchange-service:0.0.11-SNAPSHOT
           imagePullPolicy: IfNotPresent
           name: mmv2-currency-exchange-service
+          resources:
+            limits:
+              cpu: 500m
+              ephemeral-storage: 1Gi
+              memory: 2Gi
+            requests:
+              cpu: 500m
+              ephemeral-storage: 1Gi
+              memory: 2Gi
       restartPolicy: Always
 ---
 apiVersion: v1

@@ -1,7 +1,7 @@
 Currency Exchange Service
 - http://localhost:8000/currency-exchange/from/USD/to/INR
 - K8s:
-    http://34.45.103.67:8000/currency-exchange/from/USD/to/INR
+    http://34.171.101.19:8000/currency-exchange/from/USD/to/INR
 
 Currency Conversion Service
 - http://localhost:8100/currency-conversion-feign/from/USD/to/INR/quantity/10
