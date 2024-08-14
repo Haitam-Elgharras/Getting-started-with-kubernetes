@@ -207,3 +207,78 @@ In Kubernetes, to avoid hardcoding configuration values, you can use `ConfigMaps
 
 The solution to avoid downtime during deployments in Kubernetes involves using ``Liveness`` and Readiness ``Probes``. These probes check the health and readiness of a microservice. The Readiness Probe ensures that traffic is only directed to a service when it's ready, preventing downtime during startup. The Liveness Probe monitors the ongoing health of the service and restarts it if necessary. By configuring these probes, Kubernetes can ensure smooth transitions between service versions, avoiding downtime by only terminating old versions once the new ones are fully operational.
 spring actuator provides a health endpoint that can be used for readiness and liveness probes by just adding some properties in the application.properties file.
+
+## Implementing Autoscaling in Kubernetes
+
+When we specify the number of replicas in a deployment or using the scale command `kubectl scale deployment currency-exchange --replicas=3`, we are manually setting the number of pods. 
+However, in a real-world scenario, the number of pods required can vary based on factors such as traffic load, CPU usage, and memory consumption. 
+To address this, Kubernetes provides **Horizontal Pod Autoscaling (HPA)**, which automatically adjusts the number of pods based on observed CPU utilization (or other select metrics).
+
+**Key Steps and Commands:**
+
+1. **Initial Setup:**
+    - Verify the number of running pods:
+      ```bash
+      kubectl get pods
+      ```
+    - Check the deployment configuration (`deployment.yaml`) to confirm the number of replicas.
+
+2. **Manual Scaling (Optional):**
+    - You can manually scale the deployment:
+      ```bash
+      kubectl scale deployment currency-exchange --replicas=2
+      ```
+
+3. **Autoscaling Setup:**
+    - To implement autoscaling based on CPU usage, use the following command:
+      ```bash
+      kubectl autoscale deployment currency-exchange --min=min_replicas --max=max_replicas --cpu-percent=max_cpu_usage_to_scale
+      ```
+    - For example:
+      ```bash
+        kubectl autoscale deployment currency-exchange --min=1 --max=3 --cpu-percent=5
+      ```
+    - **Note:** Replace `5` with the desired CPU usage percentage. In production, a value like `70` is more typical.
+
+
+4. **Verify Autoscaling:**
+    - Check the Horizontal Pod Autoscaler (HPA):
+      ```bash
+      kubectl get hpa
+      ```
+    - View the current pods and observe the scaling in action:
+      ```bash
+      kubectl get pods
+      ```
+
+5. **Monitor Resource Usage:**
+    - To see CPU usage of pods:
+      ```bash
+      kubectl top pod
+      ```
+    - To check resource usage on nodes:
+      ```bash
+      kubectl top nodes
+      ```
+
+6. **Clean Up:**
+    - Delete the Horizontal Pod Autoscaler:
+      ```bash
+      kubectl delete hpa currency-exchange
+      ```
+    - Reapply the original deployment configuration:
+      ```bash
+      kubectl apply -f deployment.yaml
+      ```
+    - Verify that the pods have returned to the desired state:
+      ```bash
+      kubectl get pods
+      ```
+
+### Key Notes:
+- **Horizontal Pod Autoscaler (HPA):** Automatically adjusts the number of pods based on observed CPU utilization (or other select metrics).
+- **CPU Usage Threshold:** Determines when a new pod is added. In the example, the threshold was set at 5% CPU utilization.
+- **Monitoring:** Use `kubectl top` commands to monitor resource usage in real-time.
+- **Autoscaler Cleanup:** Always delete the HPA if autoscaling is no longer needed, and ensure to revert the deployment to the original state because deleting the HPA does not affect the pods created by autoscaling.
+
+This process simplifies managing application load and ensures high availability by dynamically scaling the application based on demand.
